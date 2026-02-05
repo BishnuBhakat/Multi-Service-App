@@ -1,25 +1,38 @@
 import { View, Text, TextInput, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { API_BASE_URL } from "../../src/config/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-const DEMO_USER = {
-  email: "demo@gmail.com",
-  password: "123456",
-};
-
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
-  const handleLogin = async () => {
-    if (email === DEMO_USER.email && password === DEMO_USER.password) {
-        await AsyncStorage.setItem("loggedIn", "true");
-     router.replace("/(tabs)");
+  const sendOtp = async () => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const data = await res.json();
+    if (data.success) setOtpSent(true);
+    else alert(data.message);
+  };
+
+  const verifyOtp = async () => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, otp }),
+    });
+    const data = await res.json();
+
+    if (data.token) {
+      await AsyncStorage.setItem("token", data.token);
+      router.replace("/(tabs)"); // 👈 logged in
     } else {
-      alert("Invalid credentials");
+      alert(data.message);
     }
   };
 
@@ -27,12 +40,21 @@ export default function Login() {
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
 
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
-      <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
-
-      <Pressable style={styles.btn} onPress={handleLogin}>
-        <Text style={styles.btnText}>LOGIN</Text>
-      </Pressable>
+      {!otpSent ? (
+        <>
+          <TextInput placeholder="Phone" value={phone} onChangeText={setPhone} style={styles.input} />
+          <Pressable style={styles.btn} onPress={sendOtp}>
+            <Text style={styles.btnText}>SEND OTP</Text>
+          </Pressable>
+        </>
+      ) : (
+        <>
+          <TextInput placeholder="Enter OTP" value={otp} onChangeText={setOtp} style={styles.input} />
+          <Pressable style={styles.btn} onPress={verifyOtp}>
+            <Text style={styles.btnText}>VERIFY OTP</Text>
+          </Pressable>
+        </>
+      )}
 
       <Pressable onPress={() => router.push("/auth/signup")}>
         <Text style={styles.link}>Create new account</Text>
