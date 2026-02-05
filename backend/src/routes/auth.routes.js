@@ -1,7 +1,17 @@
 const router = require("express").Router();
-const { register, login } = require("../controllers/auth.controller");
+const {
+  registerSendOtp,
+  registerVerifyOtp,
+  loginSendOtp,
+  loginVerifyOtp
+} = require("../controllers/auth.controller");
 
-router.post("/register", register);
-router.post("/login", login);
+// Register
+router.post("/register/send-otp", registerSendOtp);
+router.post("/register/verify-otp", registerVerifyOtp);
+
+// Login
+router.post("/login/send-otp", loginSendOtp);
+router.post("/login/verify-otp", loginVerifyOtp);
 
 module.exports = router;
