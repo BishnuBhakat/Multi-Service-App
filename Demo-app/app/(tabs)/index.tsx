@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
 
   listItem: {
     flexDirection: "row",
-    backgroundColor: "#fb0606ff",
+    backgroundColor: "#e2e2f7ff",
     borderRadius: 14,
     padding: 12,
     marginBottom: 10,
