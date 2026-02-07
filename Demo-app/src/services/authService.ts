@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../config/api";
 
 /* ========== SIGNUP ========== */
@@ -35,16 +34,13 @@ export const loginSendOtp = async (phone: string) => {
   return res.json();
 };
 
-export const loginVerifyOtp = async (phone: string, otp: string) => {
-  const res = await fetch(`${API_BASE_URL}/api/auth/login/verify-otp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone, otp }),
-  });
-
-  const data = await res.json();
-  if (data.token) {
-    await AsyncStorage.setItem("token", data.token);
-  }
-  return data;
+const loginVerifyOtp = async (phone: string, otp: string) => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/verify-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ phone, otp }),
+    });
+    return await res.json();
 };

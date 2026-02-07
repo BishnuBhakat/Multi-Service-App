@@ -11,8 +11,11 @@ import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderNav from "../../components/HeaderNav";
+import { useAuth } from "@/src/context/AuthContext";
+
 
 const FLIPKART_BLUE = "#2874F0";
+
 
 // ✅ storage key for profile
 const PROFILE_KEY = "profile";
@@ -25,6 +28,7 @@ type Profile = {
 
 export default function Account() {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const [profile, setProfile] = useState<Profile>({
     name: "Demo User",
@@ -60,10 +64,14 @@ export default function Account() {
       };
     }, [])
   );
-
   const handleLogout = async () => {
-    await AsyncStorage.multiRemove(["seenIntro", "loggedIn"]);
-    router.replace("/auth/intro");
+    try {
+      console.log("Logging out...");
+      await AsyncStorage.removeItem("token"); // ✅ end session
+      router.replace("/auth/login");          // ✅ go to login
+    } catch (e) {
+      console.error("Logout error", e);
+    }
   };
 
   return (

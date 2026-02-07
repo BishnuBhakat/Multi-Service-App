@@ -1,4 +1,3 @@
-
 import {
   View,
   Text,
@@ -10,14 +9,24 @@ import {
   Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderNav from "../../components/HeaderNav";
 import { OFFERS } from "../data/offersData";
 import { TRENDING } from "../data/trendingData";
 import { RANDOM_ITEMS } from "../data/randomItemsData";
+import { apiFetch } from "@/src/services/apiClient";
 export default function Home() {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    const loadProfile = async () => {
+      const res = await apiFetch("/api/user/me");
+      console.log("USER DATA:", res);
+    };
+
+    loadProfile();
+  }, []);
+
 
   const goExploreMore = () => router.push("./(tabs)/explore-more");
   const goTrending = () => router.push("./(tabs)/trending");
@@ -274,7 +283,7 @@ const styles = StyleSheet.create({
 
   listItem: {
     flexDirection: "row",
-    backgroundColor: "#e2e2f7ff",
+    backgroundColor: "#8989beff",
     borderRadius: 14,
     padding: 12,
     marginBottom: 10,

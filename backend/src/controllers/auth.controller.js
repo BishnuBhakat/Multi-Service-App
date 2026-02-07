@@ -13,7 +13,7 @@ exports.registerSendOtp = async (req, res) => {
     return res.status(400).json({ message: "Phone already registered" });
   }
 
-  const otp = generateOTP();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   await User.create({
     name,
@@ -21,15 +21,13 @@ exports.registerSendOtp = async (req, res) => {
     gender,
     dob,
     otp,
-    otpExpiresAt: Date.now() + 5 * 60 * 1000 // 5 min
+    otpExpiresAt: Date.now() + 5 * 60 * 1000,
+    phoneVerified: false,
   });
 
-  console.log("REGISTER OTP:", otp); // 🔴 SMS later
+  console.log("SIGNUP OTP:", otp);
 
-  res.json({
-    success: true,
-    message: "OTP sent to phone"
-  });
+  res.json({ success: true, message: "OTP sent" });
 };
 
 // Step 2: Verify OTP
@@ -39,30 +37,22 @@ exports.registerVerifyOtp = async (req, res) => {
   const user = await User.findOne({ phone });
   if (!user) return res.status(400).json({ message: "User not found" });
 
-  if (user.otp !== otp || user.otpExpiresAt < Date.now()) {
+  if (
+    user.otp !== otp ||
+    user.otpExpiresAt < Date.now()
+  ) {
     return res.status(400).json({ message: "Invalid or expired OTP" });
   }
 
+  user.phoneVerified = true;   // ✅ VERIFIED
   user.otp = null;
   user.otpExpiresAt = null;
+
   await user.save();
 
-  const token = jwt.sign(
-    { id: user._id },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-
-  res.json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      phone: user.phone
-    }
-  });
+  res.json({ success: true, message: "Phone verified successfully" });
 };
+
 
 /* ================= LOGIN ================= */
 
@@ -71,20 +61,24 @@ exports.loginSendOtp = async (req, res) => {
   const { phone } = req.body;
 
   const user = await User.findOne({ phone });
-  if (!user) return res.status(400).json({ message: "User not registered" });
+  if (!user) {
+    return res.status(400).json({ message: "User not registered" });
+  }
 
-  const otp = generateOTP();
+  if (!user.phoneVerified) {
+    return res.status(403).json({ message: "Phone not verified" });
+  }
 
-  user.otp = otp;
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  user.otp = otp; // 🔁 overwrite old OTP
   user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
+
   await user.save();
 
   console.log("LOGIN OTP:", otp);
 
-  res.json({
-    success: true,
-    message: "OTP sent"
-  });
+  res.json({ success: true, message: "OTP sent for login" });
 };
 
 // Step 2: Verify OTP

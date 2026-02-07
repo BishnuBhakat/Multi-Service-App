@@ -11,6 +11,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(morgan("dev"));
+app.use("/api/user", require("./routes/user.routes"));
 
 app.get("/", (req, res) => {
   res.send("API is running...");
