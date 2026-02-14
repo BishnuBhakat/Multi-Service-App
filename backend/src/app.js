@@ -3,6 +3,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const app = express();
+const addressRoutes = require("./routes/address.routes");
+
 
 app.use(cors({
   origin: "*", // for development
@@ -12,6 +14,8 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/user", require("./routes/user.routes"));
+app.use("/api/address", addressRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("API is running...");

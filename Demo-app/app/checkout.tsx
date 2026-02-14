@@ -1,26 +1,39 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   StyleSheet,
   ScrollView,
   Alert,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderNav from "../components/HeaderNav";
 import { useCart } from "./context/CartContext";
 import Toast from "react-native-toast-message";
 
 type CartType = "clothing" | "grocery" | "electronics" | "jewellery";
 
+type Address = {
+  _id: string;
+  fullName: string;
+  phone: string;
+  house: string;
+  area: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  pincode: string;
+};
+
+const SELECTED_KEY = "selected_address";
+
 export default function Checkout() {
   const router = useRouter();
   const { cart, clearCart } = useCart();
   const params = useLocalSearchParams();
 
-  /* ✅ SAFE cartType detection */
   const cartTypeParam = params.cartType;
   const cartType: CartType =
     cartTypeParam === "clothing" ||
@@ -30,7 +43,6 @@ export default function Checkout() {
       ? cartTypeParam
       : "clothing";
 
-  /* ✅ PICK CORRECT CART ITEMS */
   const items = useMemo(() => {
     if (cartType === "clothing") return cart.clothing;
     if (cartType === "grocery") return cart.grocery;
@@ -39,35 +51,29 @@ export default function Checkout() {
     return [];
   }, [cartType, cart]);
 
-  /* ✅ TOTAL */
   const totalPrice = useMemo(
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     [items]
   );
 
-  /* FORM STATE */
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [stateName, setStateName] = useState("");
+  const [address, setAddress] = useState<Address | null>(null);
   const [payment, setPayment] = useState<"COD" | "UPI" | "CARD">("COD");
 
-  /* ✅ PLACE ORDER */
+  useEffect(() => {
+    const loadAddress = async () => {
+      const saved = await AsyncStorage.getItem(SELECTED_KEY);
+      if (saved) setAddress(JSON.parse(saved));
+    };
+    loadAddress();
+  }, []);
+
   const placeOrder = () => {
-    if (items.length === 0) {
+    if (items.length === 0)
       return Alert.alert("Cart", `No items in ${cartType} cart.`);
-    }
 
-    if (!name.trim()) return Alert.alert("Missing", "Enter full name");
-    if (phone.trim().length < 10) return Alert.alert("Missing", "Enter phone");
-    if (pincode.trim().length < 6) return Alert.alert("Missing", "Enter pincode");
-    if (!address.trim()) return Alert.alert("Missing", "Enter address");
-    if (!city.trim()) return Alert.alert("Missing", "Enter city");
-    if (!stateName.trim()) return Alert.alert("Missing", "Enter state");
+    if (!address)
+      return Alert.alert("Address", "Please select a delivery address.");
 
-    // ✅ UPI / CARD → toast only
     if (payment !== "COD") {
       Toast.show({
         type: "success",
@@ -76,13 +82,15 @@ export default function Checkout() {
       });
     }
 
-    // ✅ clear correct cart
     clearCart(cartType);
 
-    // ✅ go to success page
     router.replace({
       pathname: "/order-success",
-      params: { cartType, amount: String(totalPrice), payment },
+      params: {
+        cartType,
+        amount: String(totalPrice),
+        payment,
+      },
     });
   };
 
@@ -95,64 +103,68 @@ export default function Checkout() {
           Checkout - {cartType.toUpperCase()}
         </Text>
 
-        <Text style={styles.title}>Delivery Address</Text>
+        <Text style={styles.title}>Deliver to</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput value={name} onChangeText={setName} style={styles.input} />
+        {address ? (
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.name}>{address.fullName}</Text>
 
-          <Text style={styles.label}>Phone</Text>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            style={styles.input}
-            keyboardType="phone-pad"
-          />
-
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.label}>Pincode</Text>
-              <TextInput
-                value={pincode}
-                onChangeText={setPincode}
-                style={styles.input}
-                keyboardType="number-pad"
-              />
+              {/* ✅ FIXED CHANGE BUTTON */}
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/addresses",
+                    params: { cartType },
+                  })
+                }
+              >
+                <Text style={styles.change}>Change</Text>
+              </Pressable>
             </View>
 
-            <View style={{ width: 10 }} />
+            <Text style={styles.addr}>
+              {address.house}, {address.area}
+              {address.landmark ? `, ${address.landmark}` : ""}
+              {"\n"}
+              {address.city}, {address.state} - {address.pincode}
+            </Text>
 
-            <View style={{ flex: 1 }}>
-              <Text style={styles.label}>City</Text>
-              <TextInput value={city} onChangeText={setCity} style={styles.input} />
-            </View>
+            <Text style={styles.phone}>{address.phone}</Text>
           </View>
-
-          <Text style={styles.label}>State</Text>
-          <TextInput
-            value={stateName}
-            onChangeText={setStateName}
-            style={styles.input}
-          />
-
-          <Text style={styles.label}>Full Address</Text>
-          <TextInput
-            value={address}
-            onChangeText={setAddress}
-            style={[styles.input, { height: 90 }]}
-            multiline
-          />
-        </View>
+        ) : (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/addresses",
+                params: { cartType },
+              })
+            }
+          >
+            <Text style={{ color: "#2563eb", fontWeight: "900" }}>
+              Select Address
+            </Text>
+          </Pressable>
+        )}
 
         <Text style={styles.title}>Payment</Text>
+
         <View style={styles.card}>
           {(["COD", "UPI", "CARD"] as const).map((p) => (
             <Pressable
               key={p}
               onPress={() => setPayment(p)}
-              style={[styles.payOption, payment === p && styles.payActive]}
+              style={[
+                styles.payOption,
+                payment === p && styles.payActive,
+              ]}
             >
-              <Text style={[styles.payText, payment === p && styles.payTextActive]}>
+              <Text
+                style={[
+                  styles.payText,
+                  payment === p && styles.payTextActive,
+                ]}
+              >
                 {p === "COD" ? "Cash on Delivery" : p}
               </Text>
             </Pressable>
@@ -177,12 +189,32 @@ export default function Checkout() {
 const styles = StyleSheet.create({
   pageTitle: { fontSize: 20, fontWeight: "900", marginBottom: 10 },
   title: { fontSize: 18, fontWeight: "900", marginVertical: 8 },
-  card: { backgroundColor: "#fff", borderRadius: 14, padding: 12, marginBottom: 10 },
-  label: { fontSize: 12, fontWeight: "800", marginTop: 10 },
-  input: { backgroundColor: "#f9fafb", borderRadius: 12, padding: 10 },
-  row: { flexDirection: "row" },
 
-  payOption: { padding: 12, borderRadius: 12, backgroundColor: "#f3f4f6", marginBottom: 8 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+  },
+
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  name: { fontWeight: "900", fontSize: 16 },
+  addr: { marginTop: 6, color: "#475569", fontWeight: "600" },
+  phone: { marginTop: 6, fontWeight: "800" },
+
+  change: { color: "#2563eb", fontWeight: "900" },
+
+  payOption: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    marginBottom: 8,
+  },
+
   payActive: { backgroundColor: "#2563eb" },
   payText: { fontWeight: "800" },
   payTextActive: { color: "#fff" },
@@ -194,6 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
   placeBtn: {
     backgroundColor: "#fb923c",
     padding: 14,
@@ -201,5 +234,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
+
   placeText: { color: "#fff", fontWeight: "900" },
 });
