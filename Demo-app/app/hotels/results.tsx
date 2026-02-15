@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import HeaderNav from "../../components/HeaderNav";
-import { useHotelCart } from "../context/HotelCartContext";
-import { demoHotels } from "../data/hotelsData";
+import { useHotelCart } from "../../src/context/HotelCartContext";
+import { demoHotels } from "../../src/data/hotelsData";
 export default function Results() {
   const params = useLocalSearchParams();
 

@@ -39,7 +39,7 @@ export default function Intro() {
                       await AsyncStorage.setItem("seenIntro", "true");
 
                       // ✅ then go to login
-                      router.replace("/auth/login");
+                      router.replace("/auth/phone");
                   }
               }}
           >

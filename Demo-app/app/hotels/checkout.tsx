@@ -1,5 +1,5 @@
 import { View, Text, Image, Pressable } from "react-native";
-import { useHotelCart } from "../context/HotelCartContext";
+import { useHotelCart } from "../../src/context/HotelCartContext";
 
 export default function Checkout() {
   const { hotelCart } = useHotelCart();

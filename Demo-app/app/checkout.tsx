@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import HeaderNav from "../components/HeaderNav";
-import { useCart } from "./context/CartContext";
+import { useCart } from "../src/context/CartContext";
 import Toast from "react-native-toast-message";
 
 type CartType = "clothing" | "grocery" | "electronics" | "jewellery";

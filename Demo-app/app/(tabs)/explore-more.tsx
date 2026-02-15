@@ -1,8 +1,8 @@
 import { View, Text, FlatList, Image, Pressable, StyleSheet, TextInput } from "react-native";
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
-import { groceryItems } from "../data/groceryData";
-import { clothingItems } from "../data/clothingData";
+import { groceryItems } from "../../src/data/groceryData";
+import { clothingItems } from "../../src/data/clothingData";
 
 export default function ExploreMore() {
   const router = useRouter();

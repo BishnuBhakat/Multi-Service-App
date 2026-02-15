@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import HeaderNav from "../../components/HeaderNav";
-import { DEMO_ORDERS } from "../data/demoOrdersData";
+import { DEMO_ORDERS } from "../../src/data/demoOrdersData";
 export default function Orderss() {
   const router = useRouter();
 

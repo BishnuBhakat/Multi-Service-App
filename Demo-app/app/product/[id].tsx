@@ -1,14 +1,14 @@
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { groceryItems } from "../data/groceryData";
-import { clothingItems } from "../data/clothingData";
-import { jewelleryItems } from "../data/jewelleryData";
-import { electronicsItems } from "../data/electronicsData";
+import { groceryItems } from "../../src/data/groceryData";
+import { clothingItems } from "../../src/data/clothingData";
+import { jewelleryItems } from "../../src/data/jewelleryData";
+import { electronicsItems } from "../../src/data/electronicsData";
 
-import { useCart } from "../context/CartContext";
+import { useCart } from "../../src/context/CartContext";
 import Toast from "react-native-toast-message";
-import { useWishlist } from "../context/WishlistContext";
+import { useWishlist } from "../../src/context/WishlistContext";
 
 export default function ProductDetails() {
   const params = useLocalSearchParams();

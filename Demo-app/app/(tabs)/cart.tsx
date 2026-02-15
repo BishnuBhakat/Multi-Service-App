@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet, FlatList, Image,ScrollView } from "react-native";
 import HeaderNav from "../../components/HeaderNav";
-import { useCart } from "../context/CartContext";
-import { useHotelCart } from "../context/HotelCartContext";
+import { useCart } from "../../src/context/CartContext";
+import { useHotelCart } from "../../src/context/HotelCartContext";
 import { useRouter } from "expo-router";
 
 type TabKey = "clothing" | "grocery" | "jewellery" | "electronics" | "hotels";

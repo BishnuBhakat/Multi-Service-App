@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import HeaderNav from "../../components/HeaderNav";
-import { groceryItems } from "../data/groceryData";
-import { useCart } from "../context/CartContext";
+import { groceryItems } from "../../src/data/groceryData";
+import { useCart } from "../../src/context/CartContext";
 
 export default function GrocerySearch() {
   const { q } = useLocalSearchParams<{ q?: string }>();

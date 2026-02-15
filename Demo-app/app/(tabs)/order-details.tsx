@@ -12,10 +12,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import HeaderNav from "../../components/HeaderNav";
 
 // ✅ make sure these paths match your project (data should be OUTSIDE app/)
-import { groceryItems } from "../data/groceryData";
-import { clothingItems } from "../data/clothingData";
-import { electronicsItems } from "../data/electronicsData";
-import { jewelleryItems } from "../data/jewelleryData";
+import { groceryItems } from "../../src/data/groceryData";
+import { clothingItems } from "../../src/data/clothingData";
+import { electronicsItems } from "../../src/data/electronicsData";
+import { jewelleryItems } from "../../src/data/jewelleryData";
 
 type OrderItem = {
   id: string;

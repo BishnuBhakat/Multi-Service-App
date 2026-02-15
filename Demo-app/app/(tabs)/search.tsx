@@ -10,10 +10,10 @@ import {
 import { useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { groceryItems } from "../data/groceryData";
-import { clothingItems } from "../data/clothingData";
-import { jewelleryItems } from "../data/jewelleryData";
-import { electronicsItems } from "../data/electronicsData";
+import { groceryItems } from "../../src/data/groceryData";
+import { clothingItems } from "../../src/data/clothingData";
+import { jewelleryItems } from "../../src/data/jewelleryData";
+import { electronicsItems } from "../../src/data/electronicsData";
 
 type ItemAny =
   | ((typeof groceryItems)[number] & { type: "grocery" })

@@ -12,9 +12,9 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import HeaderNav from "../../components/HeaderNav";
-import { jewelleryItems } from "../data/jewelleryData";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
+import { jewelleryItems } from "../../src/data/jewelleryData";
+import { useCart } from "../../src/context/CartContext";
+import { useWishlist } from "../../src/context/WishlistContext";
 
 export default function JewellerySearch() {
   const router = useRouter();

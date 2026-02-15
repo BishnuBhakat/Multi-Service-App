@@ -11,9 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import HeaderNav from "../../components/HeaderNav";
-import { OFFERS } from "../data/offersData";
-import { TRENDING } from "../data/trendingData";
-import { RANDOM_ITEMS } from "../data/randomItemsData";
+import { OFFERS } from "../../src/data/offersData";
+import { TRENDING } from "../../src/data/trendingData";
+import { RANDOM_ITEMS } from "../../src/data/randomItemsData";
 import { apiFetch } from "@/src/services/apiClient";
 export default function Home() {
   const router = useRouter();

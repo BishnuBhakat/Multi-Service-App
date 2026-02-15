@@ -9,70 +9,94 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 import HeaderNav from "../../components/HeaderNav";
 import { useAuth } from "@/src/context/AuthContext";
-
+import { apiFetch } from "@/src/services/apiClient";
 
 const FLIPKART_BLUE = "#2874F0";
 
-
-// ✅ storage key for profile
-const PROFILE_KEY = "profile";
-
+// type Profile = {
+// name?: string;
+// email?: string;
+// phone?: string;
+// };
 type Profile = {
-  name: string;
-  email: string;
-  phone: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  gender?: "Male" | "Female";
+  dob?: string; // ISO date string from MongoDB
 };
+
 
 export default function Account() {
   const router = useRouter();
   const { logout } = useAuth();
 
-  const [profile, setProfile] = useState<Profile>({
-    name: "Demo User",
-    email: "demo@gmail.com",
-    phone: "+91 98765 43210",
-  });
+  const [profile, setProfile] = useState<Profile>({});
+  const [loading, setLoading] = useState(true);
+
 
   // ✅ Load profile whenever page is focused (after edit, it refreshes automatically)
-  useFocusEffect(
-    useCallback(() => {
-      let mounted = true;
 
-      (async () => {
-        try {
-          const raw = await AsyncStorage.getItem(PROFILE_KEY);
-          if (!raw) return;
+useFocusEffect(
+  useCallback(() => {
+    let mounted = true;
 
-          const saved = JSON.parse(raw) as Partial<Profile>;
-          if (!mounted) return;
+    const loadUser = async () => {
+      try {
+        const res = await apiFetch("/api/user/me");
 
-          setProfile((prev) => ({
-            name: saved.name ?? prev.name,
-            email: saved.email ?? prev.email,
-            phone: saved.phone ?? prev.phone,
-          }));
-        } catch {
-          // ignore parse/storage errors
+        if (!mounted) return;
+
+        if (res?.success && res?.user) {
+          // setProfile({
+          //   name: res.user.name,
+          //   email: res.user.email,
+          //   phone: res.user.phone,
+          // });
+          setProfile({
+            name: res.user.name,
+            email: res.user.email,
+            phone: res.user.phone,
+            gender: res.user.gender,
+            dob: res.user.dob,
+          });
         }
-      })();
+      } catch (e) {
+        console.log("Profile fetch error", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
-      return () => {
-        mounted = false;
-      };
-    }, [])
-  );
+    loadUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, [])
+);
+
+  if (loading) {
+    return (
+      <View style={{ flex:1, justifyContent:"center", alignItems:"center" }}>
+        <Text>Loading profile...</Text>
+      </View>
+    );
+  }
+
+
   const handleLogout = async () => {
-    try {
-      console.log("Logging out...");
-      await AsyncStorage.removeItem("token"); // ✅ end session
-      router.replace("/auth/login");          // ✅ go to login
-    } catch (e) {
-      console.error("Logout error", e);
-    }
-  };
+  try {
+    await logout(); // clears auth context
+    router.replace("/auth/phone");
+  } catch (e) {
+    console.log("Logout error", e);
+  }
+};
+
 
   return (
     <View style={styles.screen}>
@@ -96,14 +120,27 @@ export default function Account() {
 
           <Pressable
             onPress={() =>
+              // router.push({
+              //   pathname: "/edit-profile" as any,
+              //   params: {
+              //     name: profile.name,
+              //     email: profile.email,
+              //     phone: profile.phone,
+              //   },
+              // })
               router.push({
-                pathname: "/edit-profile" as any,
+                pathname: "/edit-profile",
                 params: {
-                  name: profile.name,
-                  email: profile.email,
-                  phone: profile.phone,
+                  name: profile?.name ?? "",
+                  email: profile?.email ?? "",
+                  phone: profile?.phone ?? "",
+                  gender: profile?.gender ?? "",
+                  dob: profile?.dob
+                    ? new Date(profile.dob).toISOString()
+                    : "",
                 },
               })
+
             }
             style={styles.editBtn}
           >

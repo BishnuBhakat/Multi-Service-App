@@ -12,9 +12,9 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 
 import HeaderNav from "../components/HeaderNav";
-import { electronicsItems } from "./data/electronicsData";
-import { useCart } from "./context/CartContext";
-import { useWishlist } from "./context/WishlistContext";
+import { electronicsItems } from "../src/data/electronicsData";
+import { useCart } from "../src/context/CartContext";
+import { useWishlist } from "../src/context/WishlistContext";
 
 const CATEGORIES = ["All", "Mobiles", "Television", "Laptops", "Accessories"];
 

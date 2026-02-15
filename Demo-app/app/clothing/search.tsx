@@ -10,8 +10,8 @@ import {
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import HeaderNav from "../../components/HeaderNav";
-import { clothingItems } from "../data/clothingData";
-import { useCart } from "../context/CartContext";
+import { clothingItems } from "../../src/data/clothingData";
+import { useCart } from "../../src/context/CartContext";
 
 export default function ClothingSearch() {
   const [search, setSearch] = useState("");

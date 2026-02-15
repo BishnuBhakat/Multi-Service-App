@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { OFFERS_LIST } from "../data/offersPageData";
+import { OFFERS_LIST } from "../../src/data/offersPageData";
 
 export default function OffersPage() {
   const router = useRouter();

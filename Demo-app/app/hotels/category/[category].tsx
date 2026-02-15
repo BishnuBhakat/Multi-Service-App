@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import HeaderNav from "../../../components/HeaderNav";
-import { hotels } from "./../../data/hotelsData";
-import { useCart } from "../../context/CartContext";
-import { useWishlist } from "../../context/WishlistContext";
+import { demoHotels } from "../../../src/data/hotelsData";
+import { useCart } from "../../../src/context/CartContext";
+import { useWishlist } from "../../../src/context/WishlistContext";
 
 export default function HotelsCategory() {
   const { category } = useLocalSearchParams<{ category: string }>();
@@ -25,7 +25,7 @@ export default function HotelsCategory() {
       <Text style={styles.title}>{category}</Text>
 
       <FlatList
-        data={hotels}
+        data={demoHotels}
         numColumns={2}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 10 }}
@@ -45,7 +45,7 @@ export default function HotelsCategory() {
             </Pressable>
 
             <View style={styles.actions}>
-              <Pressable
+              {/* <Pressable
                 style={styles.addBtn}
                 onPress={() => {
                   addToCart({
@@ -60,7 +60,7 @@ export default function HotelsCategory() {
                 }}
               >
                 <Text style={{ color: "#fff" }}>BOOK</Text>
-              </Pressable>
+              </Pressable> */}
 
               <Pressable
                 onPress={() => toggleLike(item)}

@@ -1,7 +1,7 @@
 import { View, Text, Image, Pressable, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { useCart } from "../../app/context/CartContext";
-import { useWishlist } from "../../app/context/WishlistContext";
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 export default function ProductCard({ item }: any) {
   const router = useRouter();

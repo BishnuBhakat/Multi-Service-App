@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { useState,useMemo } from "react";
 import HeaderNav from "../components/HeaderNav";
-import { groceryItems } from "./data/groceryData";
-import { useCart } from "./context/CartContext";
-import { useWishlist } from "./context/WishlistContext";
+import { groceryItems } from "../src/data/groceryData";
+import { useCart } from "../src/context/CartContext";
+import { useWishlist } from "../src/context/WishlistContext";
 import Toast from "react-native-toast-message";
 
 import { useRouter } from "expo-router";

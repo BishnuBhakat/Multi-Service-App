@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image, Pressable, StyleSheet } from "react-native";
 import HeaderNav from "../../components/HeaderNav";
-import { useWishlist } from "../context/WishlistContext";
-import { useCart } from "../context/CartContext";
+import { useWishlist } from "../../src/context/WishlistContext";
+import { useCart } from "../../src/context/CartContext";
 import Toast from "react-native-toast-message";
 
 export default function WishlistScreen() {

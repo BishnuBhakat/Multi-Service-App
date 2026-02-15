@@ -1,100 +1,52 @@
-const User = require("../models/User");
+// const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { generateOTP } = require("../utils/otp");
+// const { generateOTP } = require("../models/Otp");  ----->>> eta off 
 
-/* ================= REGISTER ================= */
+//Send OTP
+const User = require("../models/User");
+const Otp = require("../models/Otp");
 
-// Step 1: Send OTP
-exports.registerSendOtp = async (req, res) => {
-  const { name, phone, gender, dob } = req.body;
-
-  const exists = await User.findOne({ phone });
-  if (exists) {
-    return res.status(400).json({ message: "Phone already registered" });
-  }
-
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-  await User.create({
-    name,
-    phone,
-    gender,
-    dob,
-    otp,
-    otpExpiresAt: Date.now() + 5 * 60 * 1000,
-    phoneVerified: false,
-  });
-
-  console.log("SIGNUP OTP:", otp);
-
-  res.json({ success: true, message: "OTP sent" });
-};
-
-// Step 2: Verify OTP
-exports.registerVerifyOtp = async (req, res) => {
-  const { phone, otp } = req.body;
-
-  const user = await User.findOne({ phone });
-  if (!user) return res.status(400).json({ message: "User not found" });
-
-  if (
-    user.otp !== otp ||
-    user.otpExpiresAt < Date.now()
-  ) {
-    return res.status(400).json({ message: "Invalid or expired OTP" });
-  }
-
-  user.phoneVerified = true;   // ✅ VERIFIED
-  user.otp = null;
-  user.otpExpiresAt = null;
-
-  await user.save();
-
-  res.json({ success: true, message: "Phone verified successfully" });
-};
-
-
-/* ================= LOGIN ================= */
-
-// Step 1: Send OTP
-exports.loginSendOtp = async (req, res) => {
+exports.sendOtp = async (req, res) => {
   const { phone } = req.body;
 
-  const user = await User.findOne({ phone });
-  if (!user) {
-    return res.status(400).json({ message: "User not registered" });
-  }
+  if (!phone)
+    return res.status(400).json({ message: "Phone required" });
 
-  if (!user.phoneVerified) {
-    return res.status(403).json({ message: "Phone not verified" });
-  }
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  await Otp.findOneAndUpdate(
+    { phone },
+    { otp: code, createdAt: Date.now() },
+    { upsert: true }
+  );
 
-  user.otp = otp; // 🔁 overwrite old OTP
-  user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
+  console.log("OTP:", code); // SMS later
 
-  await user.save();
-
-  console.log("LOGIN OTP:", otp);
-
-  res.json({ success: true, message: "OTP sent for login" });
+  res.json({ success: true });
 };
 
-// Step 2: Verify OTP
-exports.loginVerifyOtp = async (req, res) => {
+
+//Verify OTP
+// const jwt = require("jsonwebtoken");   ----->> eta off korechi
+
+exports.verifyOtp = async (req, res) => {
   const { phone, otp } = req.body;
 
-  const user = await User.findOne({ phone });
-  if (!user) return res.status(400).json({ message: "User not found" });
+  const record = await Otp.findOne({ phone });
 
-  if (user.otp !== otp || user.otpExpiresAt < Date.now()) {
-    return res.status(400).json({ message: "Invalid or expired OTP" });
+  if (!record || record.otp !== otp)
+    return res.status(400).json({ message: "Invalid OTP" });
+
+  // 🔥 check if user exists
+  let user = await User.findOne({ phone });
+
+  let isNewUser = false;
+
+  if (!user) {
+    // create user with only phone
+    user = await User.create({ phone });
+    isNewUser = true;
   }
-
-  user.otp = null;
-  user.otpExpiresAt = null;
-  await user.save();
 
   const token = jwt.sign(
     { id: user._id },
@@ -105,10 +57,31 @@ exports.loginVerifyOtp = async (req, res) => {
   res.json({
     success: true,
     token,
-    user: {
-      id: user._id,
-      name: user.name,
-      phone: user.phone
-    }
+    isNewUser,
   });
 };
+
+
+//Complete Profile
+exports.completeProfile = async (req, res) => {
+  const userId = req.user.id;
+
+  const { name, email, dob } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { name, email, dob, profileCompleted: true },
+    { new: true }
+  );
+
+  res.json({ success: true, user });
+};
+
+
+
+// new
+
+
+
+
+

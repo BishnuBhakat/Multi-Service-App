@@ -1,10 +1,10 @@
 import { View, Text, FlatList, Image, Pressable, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { groceryItems } from "../../data/groceryData";
-import { clothingItems } from "../../data/clothingData";
-import { jewelleryItems } from "../../data/jewelleryData";
-import { electronicsItems } from "../../data/electronicsData";
+import { groceryItems } from "../../../src/data/groceryData";
+import { clothingItems } from "../../../src/data/clothingData";
+import { jewelleryItems } from "../../../src/data/jewelleryData";
+import { electronicsItems } from "../../../src/data/electronicsData";
 
 export default function CategoryPage() {
   const router = useRouter();
